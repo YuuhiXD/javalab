@@ -17,7 +17,7 @@ public class Elipse extends Shape {
     }
     @Override
     public String toSvg(){
-        return String.format(Locale.ENGLISH, " <ellipse rx=\"%f\" ry=\"%f\" cx=\"%f\" cy=\"%f\" %s />", rx, ry, center.getX(), center.getY(),style.toSvg());
+        return String.format(Locale.ENGLISH, " <ellipse rx=\"%f\" ry=\"%f\" cx=\"%f\" cy=\"%f\" %s />", rx, ry, center.getX(), center.getY(),super.getStyle().toSvg());
     }
     @Override
     public BoundingBox boundingBox(){
