@@ -7,7 +7,8 @@ import java.util.Locale;
 public class SvgScene {
     private int index = 0;
     private Polygon[] polygons = new Polygon[3];
-
+    private int indexE = 0;
+    private Elipse[] elipses = new Elipse[3];
     public void addPolygon(Polygon polygon) {
 //        if (index >= polygons.length) {
 //            this.index = 0;
@@ -19,14 +20,6 @@ public class SvgScene {
 //            this.index++;
 //        }
         polygons[(index++) % 3] = polygon;
-    }
-
-    @Override
-    public String toString() {
-        return "SvgScene{" +
-                "index=" + index +
-                ", polygons=" + Arrays.toString(polygons) +
-                '}';
     }
 
     private BoundingBox sceneBox() {
@@ -47,7 +40,14 @@ public class SvgScene {
                 boundingBox.width(), boundingBox.height());
         for(var polygon : polygons)
         {
-            result += "\n\t" + polygon.toSvg();
+            if(polygon != null)
+                result += "\n\t" + polygon.toSvg();
+        }
+        result += "\n";
+        for(var elipse : elipses)
+        {
+            if(elipse != null)
+                result += "\n\t" + elipse.toSvg();
         }
         result += "\n</svg>";
         return result;
@@ -58,7 +58,9 @@ public class SvgScene {
         writer.write(toSvg());
         writer.close();
     }
-
+    public void addElipse(Elipse elipse){
+        elipses[(indexE++) % 3] = elipse;
+    }
 
 
 
