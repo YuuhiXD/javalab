@@ -15,10 +15,15 @@ public class Ellipse implements Shape{
         return new BoundingBox(center.x() - rx, center.y() - ry, rx * 2, ry * 2);
     }
 
-
     public String toSvg() {
-        return String.format(Locale.ENGLISH,"<ellipse rx=\"%f\" ry=\"%f\" cx=\"%f\" cy=\"%f\"/>",
-                rx,ry,center.x(),center.y());
+        return this.toSvg("");
+//        return String.format(Locale.ENGLISH,"<ellipse rx=\"%f\" ry=\"%f\" cx=\"%f\" cy=\"%f\"/>",
+//                rx,ry,center.x(),center.y());
+    }
+
+    public String toSvg(String param) {
+        return String.format(Locale.ENGLISH,"<ellipse rx=\"%f\" ry=\"%f\" cx=\"%f\" cy=\"%f\" %s/>",
+                rx,ry,center.x(),center.y(), param);
     }
 
 

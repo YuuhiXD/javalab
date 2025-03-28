@@ -8,6 +8,12 @@ public class SolidFilledPolygon extends Polygon {
 
     @Override
     public String toSvg() {
-        return super.toSvg(String.format("fill=\"%s\" ", fill));
+        return this.toSvg("");
+//      return super.toSvg(String.format("fill=\"%s\" ", fill));
+    }
+
+    @Override
+    public String toSvg(String param) {
+        return super.toSvg(String.format("fill=\"%s\" %s", fill, param));
     }
 }

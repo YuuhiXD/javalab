@@ -1,3 +1,4 @@
+
 import java.util.Locale;
 
 public class Polygon implements Shape{
@@ -36,6 +37,6 @@ public class Polygon implements Shape{
         for(Vec2 point : points) {
             pointsString += point.x() + "," + point.y() + " ";
         }
-        return String.format(Locale.ENGLISH, "<polygon points=\"%s\" />", pointsString, param);
+        return String.format(Locale.ENGLISH, "<polygon points=\"%s\" %s />", pointsString, param);
     }
 }
