@@ -27,6 +27,14 @@ public class Person implements Comparable<Person> {
         return this.children.add(child);
     }
 
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public LocalDate getDeathDate() {
+        return deathDate;
+    }
+
     @Override
     public String toString() {
         return "Person{" +
@@ -57,7 +65,7 @@ public class Person implements Comparable<Person> {
         return this.firstName + " " + this.lastName;
     }
 
-    public static Person fromCsvLine(String line){
+    public static Person fromCsvLine(String line) throws NegativeLifespanException {
         String[] tokens = line.split(",");
         String[] nameTokens = tokens[0].split(" ");
         String firstName = nameTokens[0];
@@ -73,7 +81,15 @@ public class Person implements Comparable<Person> {
         {
             deathDate = LocalDate.parse(tokens[2], formatter);
         }
-        return new Person(firstName,lastName,birthDate,deathDate);
+        Person person = new Person(firstName,lastName,birthDate,deathDate);
+        if(birthDate != null && deathDate != null)
+        {
+            if(birthDate.isAfter(deathDate))
+            {
+                throw new NegativeLifespanException(person);
+            }
+        }
+        return person;
     }
 
     public static List<Person> fromCsv(String path)
@@ -85,12 +101,15 @@ public class Person implements Comparable<Person> {
             String line;
             while((line = reader.readLine())!=null)
             {
-                people.add(fromCsvLine(line));
+                try {
+                    people.add(fromCsvLine(line));
+                } catch (NegativeLifespanException e) {
+                    System.err.println(e.getMessage());
+                }
             }
             return people;
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
 
