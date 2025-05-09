@@ -1,12 +1,11 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+
+import java.io.*;
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class Person implements Comparable<Person> {
+public class Person implements Comparable<Person>, Serializable {
     private String firstName,lastName;
     private LocalDate birthDate;
     private LocalDate deathDate;
@@ -52,6 +51,9 @@ public class Person implements Comparable<Person> {
     public List<Person> getChildren(){
         return List.copyOf(children);
     }
+    public void addChild(Person child) {
+        children.add(child);
+    }
 
     public String name(){
         return this.firstName + " " + this.lastName;
@@ -76,25 +78,30 @@ public class Person implements Comparable<Person> {
     public static List<Person> fromCsv(String path)
     {
         try {
-            ArrayList<Person> people = new ArrayList<>();
+            Map<String, PersonWithParentStrings> peopleWithParentStrings = new HashMap<>();
             BufferedReader reader = new BufferedReader(new FileReader(path));
             reader.readLine();
             String line;
             while((line = reader.readLine())!=null)
             {
                 try {
-                    Person newPerson = fromCsvLine(line);
-                    for(Person existingPerson : people){
-                        if(existingPerson.name().equals(newPerson.name())){
+                    // Person newPerson = fromCsvLine(line);
+                    PersonWithParentStrings newPerson = PersonWithParentStrings.fromCsvLine(line);
+                    /*for(Person existingPerson : peopleWithParentStrings){
+                        if(existingPerson.name().equals(newPerson)){
                             throw new AmbiguousPersonException(existingPerson, newPerson);
                         }
-                    }
-                    people.add(newPerson);
-                } catch (NegativeLifespanException | AmbiguousPersonException e) {
+                    }*/
+                    peopleWithParentStrings.put(newPerson.person.name(), newPerson);
+                } catch (NegativeLifespanException/* | AmbiguousPersonException*/ e) {
                     System.err.println(e.getMessage());
                 }
             }
-            return people;
+            PersonWithParentStrings.linkRelatives(peopleWithParentStrings);
+            List<Person> result = new ArrayList<>();
+            for(PersonWithParentStrings personWithStrings: peopleWithParentStrings.values())
+                result.add(personWithStrings.person);
+            return result;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -106,5 +113,27 @@ public class Person implements Comparable<Person> {
 
     public LocalDate getBirthDate() {
         return birthDate;
+    }
+
+    public static void toBinaryFile(List<Person> people, String path) throws IOException {
+        FileOutputStream fos = new FileOutputStream(path);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+        oos.writeObject(people);
+
+        oos.close();
+    }
+    public static List<Person> fromBinaryFile(String path) throws IOException {
+        FileInputStream fis = new FileInputStream(path);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        List<Person> people = null;
+        try {
+            people = (ArrayList<Person>) ois.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        ois.close();
+        return people;
     }
 }
